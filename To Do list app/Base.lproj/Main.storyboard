@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="aSr-JA-P7y">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="10a-82-zvC">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -32,18 +32,25 @@
                             <outlet property="delegate" destination="fHx-WT-04G" id="9qt-eB-YkZ"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Todoey" id="CYK-zq-qdp"/>
+                    <navigationItem key="navigationItem" title="Todoey" id="CYK-zq-qdp">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="1Pe-JZ-26x">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <connections>
+                                <action selector="addButtonPressed:" destination="fHx-WT-04G" id="J4q-hx-Jpe"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tGA-Fz-jsn" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1239" y="79"/>
+            <point key="canvasLocation" x="2028" y="78"/>
         </scene>
         <!--Navigation Controller-->
-        <scene sceneID="Auc-4L-MVW">
+        <scene sceneID="kyh-2C-Lsk">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="aSr-JA-P7y" sceneMemberID="viewController">
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="10a-82-zvC" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="YHH-lB-UQo">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="9pA-IW-iml">
                         <rect key="frame" x="0.0" y="20" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="barTintColor" red="0.46202266219999999" green="0.83828371759999998" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -53,12 +60,12 @@
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="fHx-WT-04G" kind="relationship" relationship="rootViewController" id="wqT-N3-QBT"/>
+                        <segue destination="fHx-WT-04G" kind="relationship" relationship="rootViewController" id="lgT-kq-FVQ"/>
                     </connections>
                 </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="pM5-6f-yr2" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="wMV-Is-7JW" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="507.19999999999999" y="79.160419790104953"/>
+            <point key="canvasLocation" x="1238.4000000000001" y="78.260869565217391"/>
         </scene>
     </scenes>
 </document>
