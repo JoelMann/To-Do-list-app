@@ -37,7 +37,6 @@ class TableViewController: UITableViewController{
         let item = itemArray[indexPath.row]
         
         cell.textLabel?.text = item.title
-        
         cell.accessoryType = item.done ? .checkmark : .none
         
         return cell
@@ -47,8 +46,7 @@ class TableViewController: UITableViewController{
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let item = itemArray[indexPath.row]
-        
-       item.done = !item.done
+        item.done = !item.done
         
         saveItems()
         tableView.reloadData()
