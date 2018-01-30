@@ -7,13 +7,13 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 
 class TableViewController: UITableViewController{
 
-    var itemArray = [Item]()
-    let defaults = UserDefaults.standard
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    let realm = try! Realm()
+    var toDoItems : Results<Item>?
+    
     var selectedCategory : Category? {
         didSet{
             loadItems()
@@ -28,53 +28,40 @@ class TableViewController: UITableViewController{
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return itemArray.count
+        return toDoItems?.count ?? 1
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "toDoCellID", for: indexPath)
-        let item = itemArray[indexPath.row]
+        if let item = toDoItems?[indexPath.row]{
         
-        cell.textLabel?.text = item.title
-        cell.accessoryType = item.done ? .checkmark : .none
-        
+            cell.textLabel?.text = item.title
+            cell.accessoryType = item.done ? .checkmark : .none
+        }
+        else{
+            cell.textLabel?.text = "No item's added"
+        }
         return cell
     }
     
     //MARK: - Tableview Delegate Methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let item = itemArray[indexPath.row]
-        item.done = !item.done
-        
-        saveItems()
+        if let item = toDoItems?[indexPath.row]{
+            do {
+                try self.realm.write {
+                    item.done = !item.done
+                }
+            }
+            catch {
+                print("THIS DID NOT WORK")
+            }
+        }
+
         tableView.reloadData()
         tableView.deselectRow(at: indexPath, animated: true)
     }
-    
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
     
     //MARK: - Add New Items
 
@@ -86,15 +73,21 @@ class TableViewController: UITableViewController{
         
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             
-            let newItem = Item(context: self.context)
-            newItem.title = textField.text!
-            newItem.done = false
-            newItem.parentCategory = self.selectedCategory
-            
-            self.itemArray.append(newItem)
-            
-            self.saveItems()
-            
+           
+            if let currentCategory = self.selectedCategory {
+                do{
+                try self.realm.write {
+                    let newItem = Item()
+                    newItem.title = textField.text!
+                    newItem.dateCreated = Date()
+                    currentCategory.items.append(newItem)
+                    }
+                }
+                catch {
+                    print("Error in saving item w. realm \(error)")
+                }
+            }
+
             self.tableView.reloadData()
         }
         
@@ -104,63 +97,27 @@ class TableViewController: UITableViewController{
         }
         
         alert.addAction(action)
-        present(alert, animated: true, completion: nil)
+        self.present(alert, animated: true, completion: nil)
         
     }
 
-    //MARK: - Save/Load Data Method
+    //MARK: - Save/Load Data Methods
 
-    func saveItems(){
-        do{
-            try context.save()
-        }
-        catch{
-            print("error saving context \(error)")
-        }
-    }
-
-    func loadItems(with request : NSFetchRequest<Item> = Item.fetchRequest(), predicate : NSPredicate? = nil){
+    func loadItems(){
         
-        let categoryPredicate = NSPredicate(format: "parentCategory.catName MATCHES %@", selectedCategory!.catName!)
-        
-        if let additionalPredicate = predicate {
-            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
-        }
-        else{
-            request.predicate = categoryPredicate
-        }
-                
-        do{
-           itemArray =  try context.fetch(request)
-        }
-        catch {
-            print("error in data retrieval through loadItems: \(error)")
-        }
+        toDoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
         tableView.reloadData()
     }
+ 
 }
-
 //MARK: - Search Bar Methods - EXTENSION
 extension TableViewController : UISearchBarDelegate {
-
+    
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        let request :  NSFetchRequest<Item> = Item.fetchRequest()
- 
-        request.predicate =  NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
         
-        let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
-        
-        request.sortDescriptors = [sortDescriptor]
-        
-        loadItems(with: request)
-        
-//        do{
-//            itemArray =  try context.fetch(request)
-//        }
-//        catch {
-//            print("error in data retrieval through loadItems: \(error)")
-//        }
+        toDoItems = toDoItems?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: true)
         tableView.reloadData()
+        
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
@@ -173,4 +130,6 @@ extension TableViewController : UISearchBarDelegate {
             //view.endEditing(true)
         }
     }
+
 }
+
